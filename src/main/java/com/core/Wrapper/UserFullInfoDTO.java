@@ -1,4 +1,4 @@
-package com.example.Model;
+package com.core.Wrapper;
 
 import java.io.Serializable;
 
