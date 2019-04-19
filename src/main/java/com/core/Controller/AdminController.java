@@ -47,9 +47,16 @@ public class AdminController {
 	@PostMapping(value="/admin/check_all_appointment")
 	@ResponseBody
 	public FormListWrapper getFormList(@RequestBody PageNumberWrapper page){
+		if(page.getNumberOfForm()<1) page.setNumberOfForm(10);
 		List<Form> list = formService.findLimit(page.getPageNumber(), page.getNumberOfForm());
-		Long numberPage = formService.getTotalPage()/page.getNumberOfForm();
-		if(formService.getTotalPage()%page.getNumberOfForm() >0) numberPage++;
+		Long numberPage;
+		if(page.getNumberOfForm()==0) {
+			numberPage=(long) 0;
+		}
+		else {
+			numberPage = formService.getTotalPage()/page.getNumberOfForm();
+			if(formService.getTotalPage()%page.getNumberOfForm() >0) numberPage++;
+		}
 		FormListWrapper wrapper = new FormListWrapper(list, page.getPageNumber(), numberPage);
 		return wrapper;
 	}
@@ -83,6 +90,7 @@ public class AdminController {
 			if (userService.checkLogin(user)) {
 				result = jwtService.generateTokenLogin(user.getUsername());
 				u = userService.loadUserByUsername(user.getUsername());
+				u.setRole("ROLE_ADMIN");
 				httpStatus = HttpStatus.OK;
 			} else {
 				result = null;

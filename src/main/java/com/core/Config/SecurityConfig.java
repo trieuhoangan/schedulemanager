@@ -45,15 +45,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().ignoringAntMatchers("/**");
 		  http.cors().and();
 		  http.authorizeRequests().antMatchers("/home**").permitAll();
-		  http.antMatcher("/**")
+		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/send_appointment").permitAll();
+		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/cancel_appointment").permitAll().antMatchers(HttpMethod.GET, "/**").permitAll();
+		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/login").permitAll();
+		  http.antMatcher("/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()
 		    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
-		    .antMatchers(HttpMethod.POST, "/login").permitAll()
-		    .antMatchers(HttpMethod.POST, "/send_appointment").permitAll()
-		    .antMatchers(HttpMethod.POST, "/cancel_appointment").permitAll()
-		    .antMatchers(HttpMethod.POST, "/admin/check_all_appointment").permitAll()
+		    .antMatchers(HttpMethod.POST, "/admin/check_all_appointment").access("hasRole('ROLE_ADMIN')")
 		    .antMatchers(HttpMethod.POST, "/admin/check_one_appointment").permitAll()
 		    .antMatchers(HttpMethod.POST, "/admin/update_appointment").permitAll()
-		    .antMatchers(HttpMethod.POST, "/admin/get_customer_history").permitAll()
-		    .antMatchers(HttpMethod.GET, "/**").permitAll();
+		    .antMatchers(HttpMethod.POST, "/admin/get_customer_history").permitAll().and()
+		    .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+		    .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
+		    
 	}
 }

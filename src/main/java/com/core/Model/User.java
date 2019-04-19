@@ -25,6 +25,7 @@ public class User  implements Serializable{
 	private String username;
 	@Column(name="password")
 	private String password;
+	@Column(name="role")
 	private String role="ROLE_ADMIN";
 	public Long getId() {
 		return id;
@@ -45,6 +46,12 @@ public class User  implements Serializable{
 		this.password = password;
 	}
 	
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
 	public List<GrantedAuthority> getAuthorities() {
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		authorities.add(new SimpleGrantedAuthority(role));
