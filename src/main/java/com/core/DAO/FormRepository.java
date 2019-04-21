@@ -17,5 +17,7 @@ public interface FormRepository{
 	public List<Form> findLimit(int i, int n);
 	public Long getTotalPage();
 	public void update(Form form);
-	public Form getByCode(String code);
+	public List<Form> getByCode(String code);
+	public List<Form> getFilterPage(String field,String value);
+	public List<Form> getSpecific(String field,String value);
 }

@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,15 +15,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.core.DAO.CaseDetailRepository;
-import com.core.Model.CaseDetail;
+import com.core.Model.Day;
 import com.core.Model.Form;
-import com.core.Service.CaseService;
+import com.core.Service.DayService;
 import com.core.Service.FormService;
 import com.core.Service.JwtService;
 import com.core.Service.UserService;
-import com.core.Wrapper.CaseWrapper;
 import com.core.Wrapper.CustomerWrapper;
+import com.core.Wrapper.DayWrapper;
+import com.core.Wrapper.FilterWrapper;
+import com.core.Wrapper.FormCodeWrapper;
 import com.core.Wrapper.FormListWrapper;
 import com.core.Wrapper.PageNumberWrapper;
 import com.core.Model.User;
@@ -44,9 +44,16 @@ public class AdminController {
 	@Autowired
 	private JwtService jwtService;
 	
+	@Autowired
+	private DayService dayService;
 	@PostMapping(value="/admin/check_all_appointment")
 	@ResponseBody
 	public FormListWrapper getFormList(@RequestBody PageNumberWrapper page){
+		if(formService.findAll().isEmpty()) {
+			FormListWrapper wrapper = new FormListWrapper(null, page.getPageNumber(),(long) 0 );
+			return wrapper;
+		}
+		else {
 		if(page.getNumberOfForm()<1) page.setNumberOfForm(10);
 		List<Form> list = formService.findLimit(page.getPageNumber(), page.getNumberOfForm());
 		Long numberPage;
@@ -58,7 +65,9 @@ public class AdminController {
 			if(formService.getTotalPage()%page.getNumberOfForm() >0) numberPage++;
 		}
 		FormListWrapper wrapper = new FormListWrapper(list, page.getPageNumber(), numberPage);
-		return wrapper;
+			return wrapper;
+		}
+		
 	}
 	
 	@PostMapping(value="/admin/check_one_appointment")
@@ -115,4 +124,49 @@ public class AdminController {
 		}
 		return result;
 	}
+	
+	@PostMapping(value="/admin/form_filter")
+	public FormListWrapper getFilter(@RequestBody FilterWrapper filter){
+		FormListWrapper wrapper = new FormListWrapper();
+		List<Form> list =  formService.getFilter(filter.getField(), filter.getValue());
+		List<Form> result = new ArrayList<Form>();
+		int begin = (filter.getPageNumber()-1)*filter.getNumberForm();
+		int end = (filter.getPageNumber()-1)*filter.getNumberForm()+filter.getNumberForm();
+		if(filter.getNumberForm() <list.size()) {
+			if(filter.getNumberForm()>(list.size()-begin)) {
+				result = list.subList((filter.getPageNumber()-1)*filter.getNumberForm(), list.size()-1);
+			}else {
+				result = list.subList(begin,end);
+			}
+		}
+		else {
+			result = list;
+		}
+		long numberPage =(long) list.size()/filter.getNumberForm();
+		if(list.size()%filter.getNumberForm()>0) numberPage++;
+		wrapper.setList(result);
+		wrapper.setNumberPage(numberPage);
+		wrapper.setPageNumber(filter.getPageNumber());
+		return wrapper;
+	}
+	
+	@PostMapping(value="/admin/config_schedule")
+	public FormCodeWrapper changeSchedule(@RequestBody Day d) {
+		FormCodeWrapper wrapper = new FormCodeWrapper();
+		wrapper.setStatus("good");
+		try {
+			dayService.update(d);
+		}
+		catch(Exception e){
+			wrapper.setStatus("bad");
+		}
+		
+		return wrapper;
+	}
+	
+	@PostMapping(value="/admin/check_schedule")
+	public List<Form> checkSchedule(@RequestBody DayWrapper wrapper){
+		return formService.getFilter("day", wrapper.getDay());
+	}
 }
+

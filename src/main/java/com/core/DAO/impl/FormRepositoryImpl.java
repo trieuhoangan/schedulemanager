@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.core.DAO.FormRepository;
 import com.core.Model.Form;
-import com.core.Model.User;
+
 @Transactional
 @Repository
 public class FormRepositoryImpl implements FormRepository{
@@ -68,16 +68,34 @@ public class FormRepositoryImpl implements FormRepository{
 		session.update(form);
 	}
 	@Override
-	public Form getByCode(String code) {
+	public List<Form> getByCode(String code) {
 		// TODO Auto-generated method stub
 		Session session = this.sessionFactory.getCurrentSession();
+		@SuppressWarnings("unchecked")
 		Query<Form> query = (Query<Form>) session.createQuery("select f from Form f where f.code=:code");
 		query.setParameter("code", code);
 		List<Form> results = query.list();
 		if(results.isEmpty())
 			return null;
-		else return query.getSingleResult();
+		else return query.getResultList();
 		
+	}
+	@Override
+	public List<Form> getFilterPage(String field, String value) {
+		Session session = this.sessionFactory.getCurrentSession();
+		@SuppressWarnings("unchecked")
+		Query<Form> query = (Query<Form>) session.createQuery("select f from Form f where f."+field+" = '"+value+"'");
+		return query.getResultList();
+	}
+
+	@Override
+	public List<Form> getSpecific(String field, String value) {
+		Session session = this.sessionFactory.getCurrentSession();
+		@SuppressWarnings("unchecked")
+		Query<Form> query = (Query<Form>) session.createQuery("select f from Form f where f.:field=:value");
+		query.setParameter("field", field);
+		query.setParameter("value", value);
+		return query.getResultList();
 	}
 
 }

@@ -24,6 +24,7 @@ public class UserRepositoryImpl implements UserRepository{
 	public User findByUsername(String username) {
 		// TODO Auto-generated method stub
 		Session session = this.sessionFactory.getCurrentSession();
+		@SuppressWarnings("unchecked")
 		Query<User> query = session.createQuery("select u from User u where u.username=:name");
 		query.setParameter("name", username);
 		List<User> results = query.list();

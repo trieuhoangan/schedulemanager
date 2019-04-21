@@ -2,9 +2,6 @@ package com.core.DAO.impl;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -46,6 +43,7 @@ public class CaseDetailRepositoryImpl implements CaseDetailRepository{
 	@Override
 	public CaseDetail findByFormId(Long id) {
 		Session session = this.sessionFactory.getCurrentSession();
+		@SuppressWarnings("unchecked")
 		Query<CaseDetail> query =(Query<CaseDetail>)  session.createQuery("from CaseDetail where form_id=:formid");
 		query.setParameter("formid", id);
 		CaseDetail caseDetail = new CaseDetail();

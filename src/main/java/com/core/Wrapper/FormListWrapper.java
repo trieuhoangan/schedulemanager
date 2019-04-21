@@ -1,5 +1,6 @@
 package com.core.Wrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.core.Model.Form;
@@ -12,6 +13,11 @@ public class FormListWrapper {
 		list = formList;
 		pageNumber = n;
 		numberPage = i;
+	}
+	public FormListWrapper() {
+		list = new ArrayList<Form>();
+		pageNumber = 0;
+		numberPage = (long) 0;
 	}
 	public List<Form> getList() {
 		return list;

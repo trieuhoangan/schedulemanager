@@ -46,13 +46,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		  http.cors().and();
 		  http.authorizeRequests().antMatchers("/home**").permitAll();
 		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/send_appointment").permitAll();
+		  http.authorizeRequests().antMatchers(HttpMethod.GET, "/check_available_case").permitAll();
 		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/cancel_appointment").permitAll().antMatchers(HttpMethod.GET, "/**").permitAll();
 		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/login").permitAll();
 		  http.antMatcher("/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()
 		    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
 		    .antMatchers(HttpMethod.POST, "/admin/check_all_appointment").access("hasRole('ROLE_ADMIN')")
-		    .antMatchers(HttpMethod.POST, "/admin/check_one_appointment").permitAll()
+		    .antMatchers(HttpMethod.POST, "/admin/form_filter").permitAll()
+		    .antMatchers(HttpMethod.POST, "/admin/config_schedule").permitAll()
+		    .antMatchers(HttpMethod.POST, "/admin/check_schedule").permitAll()
 		    .antMatchers(HttpMethod.POST, "/admin/update_appointment").permitAll()
+		    .antMatchers(HttpMethod.POST, "/admin/check_one_appointment").permitAll()
 		    .antMatchers(HttpMethod.POST, "/admin/get_customer_history").permitAll().and()
 		    .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
 		    .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
