@@ -49,4 +49,26 @@ public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthentication
 		}
 		chain.doFilter(request, response);
 	}
+	
+	public void destroy(ServletRequest request) {
+		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		String authToken = httpRequest.getHeader(TOKEN_HEADER);
+		if (jwtService.validateTokenLogin(authToken)) {
+			String username = jwtService.getUsernameFromToken(authToken);
+			com.core.Model.User user = userService.findByUserName(username);
+			if (user != null) {
+				boolean enabled = false;
+				boolean accountNonExpired = false;
+				boolean credentialsNonExpired = false;
+				boolean accountNonLocked = false;
+				UserDetails userDetail = new User(username, user.getPassword(), enabled, accountNonExpired,
+						credentialsNonExpired, accountNonLocked, user.getAuthorities());
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetail,
+						null, userDetail.getAuthorities());
+				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+			}
+		}
+		
+	}
 }

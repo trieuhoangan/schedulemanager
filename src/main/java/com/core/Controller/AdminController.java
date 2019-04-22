@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ import com.core.Wrapper.FormCodeWrapper;
 import com.core.Wrapper.FormListWrapper;
 import com.core.Wrapper.PageNumberWrapper;
 import com.core.Model.User;
+import com.core.Rest.JwtAuthenticationTokenFilter;
 import com.core.Wrapper.LoginDTO;
 
 @RestController
@@ -43,6 +45,9 @@ public class AdminController {
 	
 	@Autowired
 	private JwtService jwtService;
+	
+	@Autowired
+	private JwtAuthenticationTokenFilter jwtAuthen;
 	
 	@Autowired
 	private DayService dayService;
@@ -167,6 +172,11 @@ public class AdminController {
 	@PostMapping(value="/admin/check_schedule")
 	public List<Form> checkSchedule(@RequestBody DayWrapper wrapper){
 		return formService.getFilter("day", wrapper.getDay());
+	}
+	
+	@RequestMapping(value="/logout")
+	public void logOut(HttpServletRequest httpServletRequest) {
+		jwtAuthen.destroy(httpServletRequest);
 	}
 }
 
