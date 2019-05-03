@@ -1,20 +1,23 @@
 package com.core.Wrapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FilterWrapper {
-	private String field;
-	private String value;
+	private List<String> field;
+	private List<String> value;
 	private int pageNumber;
 	private int numberForm;
-	public String getField() {
+	public List<String> getField() {
 		return field;
 	}
-	public void setField(String field) {
+	public void setField(List<String> field) {
 		this.field = field;
 	}
-	public String getValue() {
+	public List<String> getValue() {
 		return value;
 	}
-	public void setValue(String value) {
+	public void setValue(List<String> value) {
 		this.value = value;
 	}
 	public int getPageNumber() {
@@ -30,12 +33,12 @@ public class FilterWrapper {
 		this.numberForm = numberForm;
 	}
 	public FilterWrapper() {
-		field = "";
-		value = "";
+		field = new ArrayList<String>();
+		value = new ArrayList<String>();
 		pageNumber = 0;
 		numberForm =0;
 	}
-	public FilterWrapper(String field, String value, int pageNumber, int numberForm) {
+	public FilterWrapper(List<String>  field, List<String>  value, int pageNumber, int numberForm) {
 		super();
 		this.field = field;
 		this.value = value;

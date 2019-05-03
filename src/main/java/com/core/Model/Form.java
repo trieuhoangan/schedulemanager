@@ -41,13 +41,26 @@ public class Form implements Serializable{
 	private int end;
 	@Column(name="dayID")
 	private Long dayID;
+	@Column(name="gender")
+	private String gender;
+	@Column(name="home")
+	private String home;
+	@Column(name="problem")
+	private String problem;
+	@Column(name="address")
+	private String address;
+	
 	
 	public Form() {
 		
 	}
 
+
+
+
 	public Form(Long id, String name, String phoneNumber, String status, String result, String code, String day,
-			String session, boolean stay, String begin, int end, Long dayID) {
+			String session, boolean stay, String begin, int end, Long dayID, String gender, String home, String problem,
+			String address) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -61,7 +74,13 @@ public class Form implements Serializable{
 		this.begin = begin;
 		this.end = end;
 		this.dayID = dayID;
+		this.gender = gender;
+		this.home = home;
+		this.problem = problem;
+		this.address = address;
 	}
+
+
 	public Form(Form form) {
 		this.id = form.getId();
 		this.name = form.getName();
@@ -75,6 +94,10 @@ public class Form implements Serializable{
 		this.begin = form.getBegin();
 		this.end = form.getEnd();
 		this.dayID = form.getDayID();
+		this.gender = form.getGender();
+		this.problem = form.getProblem();
+		this.address  = form.getAddress();
+		this.home = form.getHome();
 	}
 	public String getCode() {
 		return code;
@@ -155,4 +178,43 @@ public class Form implements Serializable{
 	public String toString() {
 		return name+" "+phoneNumber+" "+status;
 	}
+	public String getGender() {
+		return gender;
+	}
+
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+
+	public String getHome() {
+		return home;
+	}
+
+
+	public void setHome(String home) {
+		this.home = home;
+	}
+
+
+	public String getProblem() {
+		return problem;
+	}
+
+
+	public void setProblem(String problem) {
+		this.problem = problem;
+	}
+
+
+	public String getAddress() {
+		return address;
+	}
+
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 }

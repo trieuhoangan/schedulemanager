@@ -2,8 +2,7 @@ package com.core.DAO.impl;
 
 import java.util.List;
 
-
-
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -39,7 +38,7 @@ public class FormRepositoryImpl implements FormRepository{
 	@Override
 	public List<Form> findAll() {
 		// TODO Auto-generated method stub
-		String query = "select f from Form f";
+		String query = "select f from Form f order by f.id DESC";
 		Session session = this.sessionFactory.getCurrentSession();
 		Query<Form> query_info = (Query<Form>) session.createQuery(query);
 		return query_info.list();
@@ -47,16 +46,18 @@ public class FormRepositoryImpl implements FormRepository{
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Form> findLimit(int i, int n) {
-		String query = "select * from form f order by f.id desc limit "+(i-1)*n+","+n;
+		String query = "select f from Form f order by f.id DESC";
 		Session session = this.sessionFactory.getCurrentSession();
-		Query<Form> query_info = (Query<Form>) session.createNativeQuery(query);
-		return query_info.list();
+		Query<Form> query_info = (Query<Form>) session.createQuery(query);
+		query_info.setFirstResult(i*n);
+		query_info.setMaxResults(n);
+		return query_info.getResultList();
 
 	}
 	@SuppressWarnings("unchecked")
 	@Override
 	public Long getTotalPage() {
-		String query = "select count(*) from Form f";
+		String query = "select count(*) from Form f order by f.id DESC";
 		Session session = this.sessionFactory.getCurrentSession();
 		Query<Long> query_info = (Query<Long>) session.createQuery(query);
 		return query_info.list().get(0);
@@ -84,7 +85,8 @@ public class FormRepositoryImpl implements FormRepository{
 	public List<Form> getFilterPage(String field, String value) {
 		Session session = this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		Query<Form> query = (Query<Form>) session.createQuery("select f from Form f where f."+field+" = '"+value+"'");
+		Query<Form> query = (Query<Form>) session.createQuery("select f from Form f where f."+field+" LIKE :value order by f.id DESC");
+		query.setParameter("value", "%"+value+"%");
 		return query.getResultList();
 	}
 
@@ -92,10 +94,15 @@ public class FormRepositoryImpl implements FormRepository{
 	public List<Form> getSpecific(String field, String value) {
 		Session session = this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		Query<Form> query = (Query<Form>) session.createQuery("select f from Form f where f.:field=:value");
-		query.setParameter("field", field);
+		Query<Form> query = (Query<Form>) session.createQuery("select f from Form f where f."+field +"=:value order by f.id DESC");
 		query.setParameter("value", value);
 		return query.getResultList();
+	}
+	@Override
+	public void delete(Form form) {
+		// TODO Auto-generated method stub
+		Session session = this.sessionFactory.getCurrentSession();
+		session.delete(form);
 	}
 
 }

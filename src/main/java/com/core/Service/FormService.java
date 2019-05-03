@@ -14,5 +14,6 @@ public interface FormService {
 	public void cancelForm(String code);
 	public boolean isExistCode(String code);
 	public boolean regisForm(Form form);
-	public List<Form> getFilter(String field,String value);
+	public List<Form> getFilter(List<String> field,List<String> value);
+	public List<Form> getSpecified(List<String> field,List<String> value);
 }

@@ -148,5 +148,51 @@ public class DayServiceImpl implements DayService {
 		return dayRepository.findByDay(Day);
 	}
 
+	@Override
+	public List<Day> findLimit(int i, int n) {
+		// TODO Auto-generated method stub
+		return dayRepository.findLimit(i, n);
+	}
+
+	@Override
+	public long getTotalPage() {
+		
+		return dayRepository.getTotalPage();
+	}
+
+	@Override
+	public List<Day> getFilter(List<String> field, List<String> value) {
+		ArrayList<Day> result = new ArrayList<Day>();
+		if(field.contains("day")) {
+			result.addAll(dayRepository.getFilterPage("day", value.get(field.indexOf("day"))));
+		}
+		for (int i=0 ;i <field.size();i++) {
+			if(field.get(i).matches("day")) continue;
+			int v = Integer.parseInt(value.get(i));
+			List<Day> list = dayRepository.getFilterCasePage(field.get(i), v);
+			if( i==0 && result.isEmpty()) {
+				result.addAll(list);
+			}
+			else {
+				if(result.isEmpty()) continue;
+				for(int j = 0 ; j <result.size();j++) {
+					if(!checkContain(list, result.get(j))) {
+						result.remove(result.get(j));
+						j--;
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	private boolean checkContain(List<Day> list,Day d) {
+		for(int i =0;i<list.size();i++) {
+			if(list.get(i).getDay().matches(d.getDay())) return true;
+		}
+		return false;
+		
+	}
+
 
 }

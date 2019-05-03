@@ -66,9 +66,7 @@ public class CustomerController {
 		try {
 			if(formService.isExistCode(code.getCode()))
 				formService.cancelForm(code.getCode());
-			else {
-				
-			}
+
 		}
 		catch (Exception e) {
 			// TODO: handle exception

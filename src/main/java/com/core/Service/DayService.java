@@ -18,4 +18,7 @@ public interface DayService {
 	public void regisDay(Form form,String day);
 	public List<Day> freeDay();
 	public Day findByDay(String Day);
+	public List<Day> findLimit(int i, int n);
+	public long getTotalPage();
+	public List<Day> getFilter(List<String> field,List<String> value);
 }

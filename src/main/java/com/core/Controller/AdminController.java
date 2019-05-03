@@ -22,7 +22,10 @@ import com.core.Service.DayService;
 import com.core.Service.FormService;
 import com.core.Service.JwtService;
 import com.core.Service.UserService;
+import com.core.Wrapper.AppointmentIDWrapper;
 import com.core.Wrapper.CustomerWrapper;
+import com.core.Wrapper.DayDTO;
+import com.core.Wrapper.DayListWrapper;
 import com.core.Wrapper.DayWrapper;
 import com.core.Wrapper.FilterWrapper;
 import com.core.Wrapper.FormCodeWrapper;
@@ -52,33 +55,51 @@ public class AdminController {
 	@Autowired
 	private DayService dayService;
 	@PostMapping(value="/admin/check_all_appointment")
-	@ResponseBody
 	public FormListWrapper getFormList(@RequestBody PageNumberWrapper page){
 		if(formService.findAll().isEmpty()) {
-			FormListWrapper wrapper = new FormListWrapper(null, page.getPageNumber(),(long) 0 );
+			FormListWrapper wrapper = new FormListWrapper(new ArrayList<Form>(), page.getPageNumber(),(long) 0 );
 			return wrapper;
 		}
 		else {
-		if(page.getNumberOfForm()<1) page.setNumberOfForm(10);
-		List<Form> list = formService.findLimit(page.getPageNumber(), page.getNumberOfForm());
-		Long numberPage;
-		if(page.getNumberOfForm()==0) {
-			numberPage=(long) 0;
-		}
-		else {
-			numberPage = formService.getTotalPage()/page.getNumberOfForm();
-			if(formService.getTotalPage()%page.getNumberOfForm() >0) numberPage++;
-		}
-		FormListWrapper wrapper = new FormListWrapper(list, page.getPageNumber(), numberPage);
+			if(page.getNumberOfForm()<1) page.setNumberOfForm(10);
+			List<Form> list = formService.findLimit(page.getPageNumber()-1, page.getNumberOfForm());
+			Long numberPage;
+			if(page.getNumberOfForm()==0) {
+				numberPage=(long) 0;
+			}
+			else {
+				numberPage = formService.getTotalPage();
+			}
+			ArrayList<Form> result  = new ArrayList<Form>();
+			result.addAll(list);
+			FormListWrapper wrapper = new FormListWrapper();
+			wrapper.setList(result);
+			wrapper.setNumberPage(numberPage);
+			wrapper.setPageNumber(page.getPageNumber());
+			
 			return wrapper;
 		}
 		
 	}
 	
 	@PostMapping(value="/admin/check_one_appointment")
-	public Form getOneCase(@RequestBody Long id) {
-		Form form = formService.findById(id);
+	@ResponseBody
+	public Form getOneCase(@RequestBody AppointmentIDWrapper id) {
+//		Long ID = Long.parseLong(id.getId());
+		Form form = formService.findById(id.getId());
 		return form;
+	}
+	@PostMapping(value="/admin/cancelAppointment")
+	public String cancelAppointment(@RequestBody AppointmentIDWrapper id) {
+		Form form = formService.findById(id.getId());
+		String result ="success";
+		try {
+			formService.cancelForm(form.getCode());
+		}
+		catch(Exception e) {
+			result ="failed";
+		}
+		return result;
 	}
 	
 	@PostMapping(value="/admin/update_appointment")
@@ -132,7 +153,8 @@ public class AdminController {
 	
 	@PostMapping(value="/admin/form_filter")
 	public FormListWrapper getFilter(@RequestBody FilterWrapper filter){
-		FormListWrapper wrapper = new FormListWrapper();
+	
+		
 		List<Form> list =  formService.getFilter(filter.getField(), filter.getValue());
 		List<Form> result = new ArrayList<Form>();
 		int begin = (filter.getPageNumber()-1)*filter.getNumberForm();
@@ -147,36 +169,118 @@ public class AdminController {
 		else {
 			result = list;
 		}
-		long numberPage =(long) list.size()/filter.getNumberForm();
-		if(list.size()%filter.getNumberForm()>0) numberPage++;
-		wrapper.setList(result);
-		wrapper.setNumberPage(numberPage);
-		wrapper.setPageNumber(filter.getPageNumber());
+		long numberPage =(long) list.size();
+		FormListWrapper wrapper = new FormListWrapper(result,filter.getPageNumber(),numberPage);
+
+		return wrapper;
+	}
+	
+	@PostMapping(value="/customer_result")
+	public FormListWrapper getCustomerFilter(@RequestBody FilterWrapper filter){
+	
+		
+		List<Form> list =  formService.getSpecified(filter.getField(), filter.getValue());
+		List<Form> result = new ArrayList<Form>();
+		int begin = (filter.getPageNumber()-1)*filter.getNumberForm();
+		int end = (filter.getPageNumber()-1)*filter.getNumberForm()+filter.getNumberForm();
+		if(filter.getNumberForm() <list.size()) {
+			if(filter.getNumberForm()>(list.size()-begin)) {
+				result = list.subList((filter.getPageNumber()-1)*filter.getNumberForm(), list.size()-1);
+			}else {
+				result = list.subList(begin,end);
+			}
+		}
+		else {
+			result = list;
+		}
+		long numberPage =(long) list.size();
+		FormListWrapper wrapper = new FormListWrapper(result,filter.getPageNumber(),numberPage);
+
 		return wrapper;
 	}
 	
 	@PostMapping(value="/admin/config_schedule")
-	public FormCodeWrapper changeSchedule(@RequestBody Day d) {
+	public FormCodeWrapper changeSchedule(@RequestBody DayDTO d) {
 		FormCodeWrapper wrapper = new FormCodeWrapper();
-		wrapper.setStatus("good");
-		try {
-			dayService.update(d);
+		if(d.getDay().getAfternoonCase()>0||d.getDay().getMorningCase()>0) {
+			wrapper.setStatus("not allowed to change");
+			return wrapper;
 		}
-		catch(Exception e){
-			wrapper.setStatus("bad");
+		Day day = dayService.findByDay(d.getDay().getDay());
+		if(day==null) {
+			dayService.save(day);
 		}
-		
+		else {
+			day.setMorningMaxCase(d.getDay().getMorningMaxCase());
+			day.setAfternoonMaxCase(d.getDay().getAfternoonMaxCase());
+			wrapper.setStatus("good");
+			try {
+				dayService.update(day);
+			}
+			catch(Exception e){
+				wrapper.setStatus("bad");
+			}
+		}
 		return wrapper;
 	}
 	
 	@PostMapping(value="/admin/check_schedule")
-	public List<Form> checkSchedule(@RequestBody DayWrapper wrapper){
-		return formService.getFilter("day", wrapper.getDay());
+	public DayListWrapper checkSchedule(@RequestBody PageNumberWrapper page){
+		if(dayService.findAll().isEmpty()) {
+			DayListWrapper wrapper = new DayListWrapper(new ArrayList<Day>(), page.getPageNumber(), (long)0 );
+			return wrapper;
+		}
+		else {
+			if(page.getNumberOfForm()<1) page.setNumberOfForm(10);
+			List<Day> list = dayService.findLimit(page.getPageNumber()-1, page.getNumberOfForm());
+			long numberPage;
+			if(page.getNumberOfForm()==0) {
+				numberPage= 0;
+			}
+			else {
+				numberPage = dayService.getTotalPage();
+			}
+			ArrayList<Day> result  = new ArrayList<Day>();
+			result.addAll(list);
+			DayListWrapper wrapper = new DayListWrapper();
+			wrapper.setList(result);
+			wrapper.setNumberPage(numberPage);
+			wrapper.setPageNumber(page.getPageNumber());
+			
+			return wrapper;
+		}
+	}
+	
+	@PostMapping(value="/admin/day_filter")
+	public DayListWrapper getFilterDay(@RequestBody FilterWrapper filter){
+	
+		
+		List<Day> list =  dayService.getFilter(filter.getField(), filter.getValue());
+		List<Day> result = new ArrayList<Day>();
+		int begin = (filter.getPageNumber()-1)*filter.getNumberForm();
+		int end = (filter.getPageNumber()-1)*filter.getNumberForm()+filter.getNumberForm();
+		if(filter.getNumberForm() <list.size()) {
+			if(filter.getNumberForm()>(list.size()-begin)) {
+				result = list.subList((filter.getPageNumber()-1)*filter.getNumberForm(), list.size()-1);
+			}else {
+				result = list.subList(begin,end);
+			}
+		}
+		else {
+			result = list;
+		}
+		long numberPage =(long) list.size();
+		DayListWrapper wrapper = new DayListWrapper(result,filter.getPageNumber(),numberPage);
+//		wrapper.setList(result);
+//		wrapper.setNumberPage(numberPage);
+//		wrapper.setPageNumber(filter.getPageNumber());
+		return wrapper;
 	}
 	
 	@RequestMapping(value="/logout")
 	public void logOut(HttpServletRequest httpServletRequest) {
 		jwtAuthen.destroy(httpServletRequest);
+		
 	}
 }
 

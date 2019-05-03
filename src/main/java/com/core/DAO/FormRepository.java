@@ -12,6 +12,7 @@ import com.core.Model.Form;
 
 public interface FormRepository{
 	public void save(Form form);
+	public void delete(Form form);
 	public List<Form> findAll();
 	public Form findById(Long id);
 	public List<Form> findLimit(int i, int n);

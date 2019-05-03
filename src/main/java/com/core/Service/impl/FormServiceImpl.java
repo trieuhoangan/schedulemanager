@@ -1,5 +1,6 @@
 package com.core.Service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +53,13 @@ public class FormServiceImpl implements FormService {
 	public void cancelForm(String code) {
 		List<Form> list= formRepository.getByCode(code);
 		for(int i =0;i<list.size();i++) {
-			Day d = dayRepository.findById(list.get(i).getDayID());
+			Day d = dayRepository.findByDay(list.get(i).getDay());
 			if(list.get(i).getSession().matches("morning")) {
-				d.setMorningCase(d.getMorningCase()-1);
+				if(d.getMorningCase()>0)
+					d.setMorningCase(d.getMorningCase()-1);
 			}
 			if(list.get(i).getSession().matches("afternoon")) {
+				if(d.getAfternoonCase()>0)
 				d.setAfternoonCase(d.getAfternoonCase()-1);
 			}
 			list.get(i).setStatus("canceled");
@@ -97,8 +100,51 @@ public class FormServiceImpl implements FormService {
 	}
 
 	@Override
-	public List<Form> getFilter(String field, String value) {
-		return formRepository.getFilterPage(field, value);
+	public List<Form> getFilter(List<String> field, List<String> value) {
+		ArrayList<Form> result = new ArrayList<Form>();
+		for (int i=0 ;i <field.size();i++) {
+			List<Form> list = formRepository.getFilterPage(field.get(i), value.get(i));
+			if( i==0) {
+				result.addAll(list);
+			}
+			else {
+				if(result.isEmpty()) continue;
+				for(int j = 0 ; j <result.size();j++) {
+					if(!checkContain(list, result.get(j))) {
+						result.remove(result.get(j));
+						j--;
+					}
+				}
+			}
+		}
+		return result;
 	}
 
+	private boolean checkContain(List<Form> list, Form f) {
+		for(int i = 0;i<list.size();i++) {
+			if(list.get(i).getId()==f.getId()) return true;
+		}
+		return false;
+	}
+
+	@Override
+	public List<Form> getSpecified(List<String> field, List<String> value) {
+		ArrayList<Form> result = new ArrayList<Form>();
+		for (int i=0 ;i <field.size();i++) {
+			List<Form> list = formRepository.getSpecific(field.get(i), value.get(i));
+			if( i==0) {
+				result.addAll(list);
+			}
+			else {
+				if(result.isEmpty()) continue;
+				for(int j = 0 ; j <result.size();j++) {
+					if(!checkContain(list, result.get(j))) {
+						result.remove(result.get(j));
+						j--;
+					}
+				}
+			}
+		}
+		return result;
+	}
 }
