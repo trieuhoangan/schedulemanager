@@ -57,12 +57,14 @@ public class CustomerController {
 		try {
 			if(!formService.regisForm(form)) {
 				wrapper.setCode("");
-				wrapper.setStatus("bad");
+				wrapper.setStatus("wrong day");
+				return wrapper;
 			}
 		}
 		catch(Exception e) {
 			wrapper.setCode("");
 			wrapper.setStatus("bad");
+			return wrapper;
 		}
 		wrapper.setStatus("good");
 		return wrapper;
@@ -86,6 +88,7 @@ public class CustomerController {
 				}
 				wrapper.setStatus("cant");
 				wrapper.setCode(busyDay);
+				return wrapper;
 			}
 			
 		}
@@ -176,6 +179,12 @@ public class CustomerController {
 	@PostMapping("/get_day_detail")
 	public Day getDay(@RequestBody DayWrapper day) {
 		Day d = dayService.findByDay(day.getDay());
+		if(d==null) {
+			d = new Day();
+			d.setDay(day.getDay());
+			dayService.save(d);
+			return dayService.findByDay(day.getDay());
+		}
 		return d;
 	}
 	

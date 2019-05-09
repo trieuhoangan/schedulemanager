@@ -108,7 +108,11 @@ public class DayServiceImpl implements DayService {
 		}
 //		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		for(int i =0;i<list.size();i++) {
+			
 			Day d = dayRepository.findByDay(list.get(i));
+			if(!(d.getAfternoonCase()<d.getAfternoonMaxCase())&&!(d.getMorningCase()<d.getMorningMaxCase())) {
+				return false;
+			}
 			d.setAfternoonCase(d.getAfternoonCase()+1);
 			d.setMorningCase(d.getMorningCase()+1);
 			Form Morning = new Form(form);
@@ -124,6 +128,7 @@ public class DayServiceImpl implements DayService {
 			dayRepository.update(d);
 			formRepository.save(Morning);
 			formRepository.save(Afternoon);	
+			
 		}
 		return true;
 	}
