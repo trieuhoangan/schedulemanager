@@ -5,7 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +80,8 @@ public class DayServiceImpl implements DayService {
 		return true;
 	}
 	
-	private List<String> getDayList(String begin, int end) throws ParseException{
+	@Override
+	public List<String> getDayList(String begin, int end) throws ParseException{
 		Calendar c = Calendar.getInstance(); 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		
@@ -94,18 +95,20 @@ public class DayServiceImpl implements DayService {
 	}
 
 	@Override
-	public void regisStay(Form form,String begin, int end) throws ParseException {
+	public boolean regisStay(Form form,String begin, int end) throws ParseException {
 		List<String> list = this.getDayList(begin, end);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		for(int i =0;i<list.size();i++) {
 			Day d = dayRepository.findByDay(list.get(i));
 			if(d==null) {
 				d = new Day();
 				d.setDay(list.get(i));
 				dayRepository.save(d);
-				
 			}
-			d = dayRepository.findByDay(list.get(i));
+			if(!d.isAvai()) return false;
+		}
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		for(int i =0;i<list.size();i++) {
+			Day d = dayRepository.findByDay(list.get(i));
 			d.setAfternoonCase(d.getAfternoonCase()+1);
 			d.setMorningCase(d.getMorningCase()+1);
 			Form Morning = new Form(form);
@@ -122,6 +125,7 @@ public class DayServiceImpl implements DayService {
 			formRepository.save(Morning);
 			formRepository.save(Afternoon);	
 		}
+		return true;
 	}
 
 	@Override

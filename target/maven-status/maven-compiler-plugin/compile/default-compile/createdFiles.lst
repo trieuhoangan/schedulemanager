@@ -7,6 +7,7 @@ com\core\Model\User.class
 com\core\Service\CaseService.class
 com\core\Rest\CustomAccessDeniedHandler.class
 com\core\Service\JwtService.class
+com\core\Wrapper\DayDTO.class
 com\core\Wrapper\UserFullInfoDTO.class
 com\core\DAO\impl\DayRepositoryImpl.class
 com\core\Service\impl\UserServiceImpl.class
@@ -23,6 +24,7 @@ com\core\Service\impl\DayServiceImpl.class
 com\core\Wrapper\DayWrapper.class
 com\core\Controller\AdminController.class
 com\core\DAO\impl\UserRepositoryImpl.class
+com\core\Wrapper\DayListWrapper.class
 com\core\Controller\CustomerController.class
 com\core\Model\Form.class
 com\core\Wrapper\FormListWrapper.class
@@ -30,6 +32,7 @@ com\core\DAO\UserRepository.class
 com\core\Config\BeanConfig.class
 com\core\Service\impl\CaseServiceImpl.class
 com\core\Wrapper\FormCodeWrapper.class
+com\core\Wrapper\AppointmentIDWrapper.class
 com\core\Service\UserService.class
 com\core\Wrapper\FilterWrapper.class
 com\core\DAO\DayRepository.class

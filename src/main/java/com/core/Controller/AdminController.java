@@ -175,29 +175,7 @@ public class AdminController {
 		return wrapper;
 	}
 	
-	@PostMapping(value="/customer_result")
-	public FormListWrapper getCustomerFilter(@RequestBody FilterWrapper filter){
 	
-		
-		List<Form> list =  formService.getSpecified(filter.getField(), filter.getValue());
-		List<Form> result = new ArrayList<Form>();
-		int begin = (filter.getPageNumber()-1)*filter.getNumberForm();
-		int end = (filter.getPageNumber()-1)*filter.getNumberForm()+filter.getNumberForm();
-		if(filter.getNumberForm() <list.size()) {
-			if(filter.getNumberForm()>(list.size()-begin)) {
-				result = list.subList((filter.getPageNumber()-1)*filter.getNumberForm(), list.size()-1);
-			}else {
-				result = list.subList(begin,end);
-			}
-		}
-		else {
-			result = list;
-		}
-		long numberPage =(long) list.size();
-		FormListWrapper wrapper = new FormListWrapper(result,filter.getPageNumber(),numberPage);
-
-		return wrapper;
-	}
 	
 	@PostMapping(value="/admin/config_schedule")
 	public FormCodeWrapper changeSchedule(@RequestBody DayDTO d) {
@@ -208,7 +186,13 @@ public class AdminController {
 		}
 		Day day = dayService.findByDay(d.getDay().getDay());
 		if(day==null) {
+			day = new Day();
+			day.setDay(d.getDay().getDay());
+			day.setAfternoonMaxCase(d.getDay().getAfternoonMaxCase());
+			day.setMorningMaxCase(d.getDay().getMorningMaxCase());
 			dayService.save(day);
+			wrapper.setCode("");
+			wrapper.setStatus("good");
 		}
 		else {
 			day.setMorningMaxCase(d.getDay().getMorningMaxCase());
@@ -282,5 +266,30 @@ public class AdminController {
 		jwtAuthen.destroy(httpServletRequest);
 		
 	}
+	
+	@PostMapping("/admin/add_account")
+	public FormCodeWrapper addAccount(@RequestBody User user) {
+		FormCodeWrapper result = new FormCodeWrapper("good","");
+		User newUser = new User();
+		newUser.setUsername(user.getUsername());
+		newUser.setPassword(user.getPassword());
+		newUser.setRole("ROLE_ADMIN");
+		try {
+			userService.save(newUser);
+		}catch(Exception e) {
+			result.setStatus("error");
+			return result;
+		}
+		return result;
+	}
+	
+	@PostMapping("/admin/get_day_detail")
+	public Day getDay(@RequestBody DayWrapper day) {
+		Day d = dayService.findByDay(day.getDay());
+		if(d==null)
+		return new Day();
+		else return d;
+	}
+	
 }
 

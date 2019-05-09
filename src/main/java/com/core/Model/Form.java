@@ -182,36 +182,29 @@ public class Form implements Serializable{
 		return gender;
 	}
 
-
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
-
 
 	public String getHome() {
 		return home;
 	}
 
-
 	public void setHome(String home) {
 		this.home = home;
 	}
-
 
 	public String getProblem() {
 		return problem;
 	}
 
-
 	public void setProblem(String problem) {
 		this.problem = problem;
 	}
 
-
 	public String getAddress() {
 		return address;
 	}
-
 
 	public void setAddress(String address) {
 		this.address = address;

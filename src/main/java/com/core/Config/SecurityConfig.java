@@ -46,7 +46,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		  http.cors().and();
 		  http.authorizeRequests().antMatchers("/home**").permitAll();
 		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/customer_result").permitAll();
+		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/get_day_detail").permitAll();
+		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/old_customer").permitAll();
+		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/admin/get_day_detail").permitAll();
+		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/multi_booking").permitAll();
 		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/send_appointment").permitAll();
+		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/send_stay_appointment").permitAll();
 		  http.authorizeRequests().antMatchers(HttpMethod.GET, "/check_available_case").permitAll();
 		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/cancel_appointment").permitAll().antMatchers(HttpMethod.GET, "/**").permitAll();
 		  http.authorizeRequests().antMatchers(HttpMethod.POST, "/login").permitAll();
