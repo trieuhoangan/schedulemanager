@@ -30,6 +30,10 @@ CREATE TABLE IF NOT EXISTS `schedulemanager`.`Form` (
   `stay` boolean null,
   `begin` VARCHAR(45) null,
   `end` int null,
+  `gender` VARCHAR(45) null,
+  `home` VARCHAR(45) null,
+  `address` VARCHAR(45) null,
+  `problem` MEDIUMTEXT null,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
