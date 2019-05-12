@@ -87,7 +87,8 @@ public class DayServiceImpl implements DayService {
 		
 		c.setTime(sdf.parse(begin));
 		List<String> list = new ArrayList<String>();
-		for(int i=0;i<=end;i++) {
+		list.add(begin);
+		for(int i=0;i<end;i++) {
 			c.add(Calendar.DATE, 1);
 			list.add(sdf.format(c.getTime()));
 		}
@@ -110,7 +111,7 @@ public class DayServiceImpl implements DayService {
 		for(int i =0;i<list.size();i++) {
 			
 			Day d = dayRepository.findByDay(list.get(i));
-			if(!(d.getAfternoonCase()<d.getAfternoonMaxCase())&&!(d.getMorningCase()<d.getMorningMaxCase())) {
+			if(!(d.getAfternoonCase()>d.getAfternoonMaxCase())&&!(d.getMorningCase()<d.getMorningMaxCase())) {
 				return false;
 			}
 			d.setAfternoonCase(d.getAfternoonCase()+1);

@@ -209,5 +209,13 @@ public class Form implements Serializable{
 	public void setAddress(String address) {
 		this.address = address;
 	}
-
+	
+	public boolean isEqual(Form form) {
+		if(!(this.id.longValue()==form.getId().longValue())) {
+			return false;
+		}else {
+			return true;
+		}
+		
+	}
 }

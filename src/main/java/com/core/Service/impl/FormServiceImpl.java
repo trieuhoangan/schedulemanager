@@ -139,7 +139,9 @@ public class FormServiceImpl implements FormService {
 
 	private boolean checkContain(List<Form> list, Form f) {
 		for(int i = 0;i<list.size();i++) {
-			if(list.get(i).getId()==f.getId()) return true;
+			if(list.get(i).isEqual(f)) {
+				return true;
+			}
 		}
 		return false;
 	}
