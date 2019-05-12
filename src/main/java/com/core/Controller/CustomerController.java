@@ -175,40 +175,48 @@ public class CustomerController {
 			dayService.save(day);
 			day = dayService.findByDay(wrapper.getDay());
 		}
-		int totalCase = day.getMorningMaxCase()-day.getMorningCase()+day.getAfternoonMaxCase()-day.getAfternoonCase();
-		if(wrapper.getNumber()>totalCase) {
-			responseWrapper.setStatus("overload");
-			return responseWrapper;
-		}
-		else {
-			try {
-				for( int i = 0; i < wrapper.getNumber()-1;i++) {
-					Form tmp = new Form();
-					tmp.setName(wrapper.getName());
-					tmp.setDay(wrapper.getDay());
-					tmp.setPhoneNumber(wrapper.getPhoneNumber());
-					tmp.setStatus("waiting");
-					tmp.setCode(token);
-					
-					if(day.getMorningCase()<day.getMorningMaxCase()) {
-						day.setMorningCase(day.getMorningCase()+1);
-						dayService.update(day);
-						tmp.setSession("morning");
-						formService.save(tmp);
-					}else {
-						tmp.setSession("afternoon");
-						formService.save(tmp);
-						day.setAfternoonCase(day.getAfternoonCase()+1);
-						dayService.update(day);
-					}
-				}
-			}catch(Exception e) {
-				responseWrapper.setStatus("error");
+		
+		int totalMorningCase = day.getMorningMaxCase()-day.getMorningCase();
+		int totalAfternoonCase = day.getAfternoonMaxCase()-day.getAfternoonCase();
+		if(wrapper.getSession().matches("morning")) {
+			if(wrapper.getNumber()>totalMorningCase) {
+				responseWrapper.setStatus("overload");
 				return responseWrapper;
 			}
-			responseWrapper.setCode(token);
+		}else {
+			if(wrapper.getNumber()>totalAfternoonCase) {
+				responseWrapper.setStatus("overload");
+				return responseWrapper;
+			}
+		}
+		
+		try {
+			for( int i = 0; i < wrapper.getNumber();i++) {
+				Form tmp = new Form();
+				tmp.setName(wrapper.getName());
+				tmp.setDay(wrapper.getDay());
+				tmp.setPhoneNumber(wrapper.getPhoneNumber());
+				tmp.setStatus("waiting");
+				tmp.setCode(token);
+				tmp.setSession(wrapper.getSession());
+				
+				if(wrapper.getSession().matches("morning")) {
+					day.setMorningCase(day.getMorningCase()+1);
+					dayService.update(day);
+					formService.save(tmp);
+				}else {
+					formService.save(tmp);
+					day.setAfternoonCase(day.getAfternoonCase()+1);
+					dayService.update(day);
+				}
+			}
+		}catch(Exception e) {
+			responseWrapper.setStatus("error");
 			return responseWrapper;
 		}
+		responseWrapper.setCode(token);
+		return responseWrapper;
+		
 	}
 	
 	@PostMapping("/get_day_detail")

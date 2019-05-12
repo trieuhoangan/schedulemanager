@@ -5,7 +5,14 @@ public class MultiCustomerWrapper {
 	private String phoneNumber;
 	private int number;
 	private String day;
+	private String session;
 	
+	public String getSession() {
+		return session;
+	}
+	public void setSession(String session) {
+		this.session = session;
+	}
 	public String getDay() {
 		return day;
 	}
