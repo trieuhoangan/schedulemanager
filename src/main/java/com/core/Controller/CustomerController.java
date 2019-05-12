@@ -1,6 +1,11 @@
 package com.core.Controller;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -26,7 +31,7 @@ import com.core.Model.Day;
 @CrossOrigin
 public class CustomerController {
 	
-
+	private static final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	@Autowired
 	private FormService formService;
 	@Autowired
@@ -72,9 +77,23 @@ public class CustomerController {
 	
 	@PostMapping(value=("/send_stay_appointment"))
 	public FormCodeWrapper receiveStayForm(@RequestBody Form form) {
+		Calendar cal = Calendar.getInstance();
+		Date currentDay = cal.getTime();
 		String token = randomAlphaNumeric(8).toString();
 		form.setCode(token); 
 		FormCodeWrapper wrapper = new FormCodeWrapper("good",token);
+		try {
+			Date date = sdf.parse(form.getBegin());
+			if(currentDay.compareTo(date)>0) {
+				wrapper.setStatus("old day");
+				return wrapper;
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			wrapper.setStatus("error");
+			return wrapper;
+			
+		}
 		try {
 			
 			if(!dayService.regisStay(form, form.getBegin(), form.getEnd())){
@@ -136,9 +155,25 @@ public class CustomerController {
 		Day day = dayService.findByDay(wrapper.getDay());
 		String token = randomAlphaNumeric(8).toString();
 		FormCodeWrapper responseWrapper = new FormCodeWrapper("good","");
-		if(day==null) {
-			responseWrapper.setCode("unexist day");
+		Calendar cal = Calendar.getInstance();
+		Date currentDay = cal.getTime();
+		try {
+			Date date = sdf.parse(wrapper.getDay());
+			if(currentDay.compareTo(date)>0) {
+				responseWrapper.setStatus("old day");
+				return responseWrapper;
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			responseWrapper.setStatus("error");
 			return responseWrapper;
+			
+		}
+		if(day==null) {
+			day = new Day();
+			day.setDay(wrapper.getDay());
+			dayService.save(day);
+			day = dayService.findByDay(wrapper.getDay());
 		}
 		int totalCase = day.getMorningMaxCase()-day.getMorningCase()+day.getAfternoonMaxCase()-day.getAfternoonCase();
 		if(wrapper.getNumber()>totalCase) {
