@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS `schedulemanager`.`Form` (
   `home` VARCHAR(45) null,
   `address` VARCHAR(45) null,
   `problem` MEDIUMTEXT null,
+  `type` varchar(45) null,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
