@@ -49,13 +49,14 @@ public class Form implements Serializable{
 	private String problem;
 	@Column(name="address")
 	private String address;
-	
+	@Column(name="type")
+	private String type;
 	
 	public Form() {
+		type="normal";
+		status ="waiting";
 		
 	}
-
-
 
 
 	public Form(Long id, String name, String phoneNumber, String status, String result, String code, String day,
@@ -218,4 +219,14 @@ public class Form implements Serializable{
 		}
 		
 	}
+
+	public String getType() {
+		return type;
+	}
+
+
+	public void setType(String type) {
+		this.type = type;
+	}
+	
 }

@@ -60,6 +60,7 @@ public class CustomerController {
 			dayService.save(d);	
 		}
 		try {
+			form.setType("normal");
 			if(!formService.regisForm(form)) {
 				wrapper.setCode("");
 				wrapper.setStatus("wrong day");
@@ -95,7 +96,7 @@ public class CustomerController {
 			
 		}
 		try {
-			
+			form.setType("stay");
 			if(!dayService.regisStay(form, form.getBegin(), form.getEnd())){
 				List<String> dayList = dayService.getDayList(form.getBegin(), form.getEnd());
 				String busyDay="";
@@ -199,6 +200,7 @@ public class CustomerController {
 				tmp.setStatus("waiting");
 				tmp.setCode(token);
 				tmp.setSession(wrapper.getSession());
+				tmp.setType("multi");
 				
 				if(wrapper.getSession().matches("morning")) {
 					day.setMorningCase(day.getMorningCase()+1);

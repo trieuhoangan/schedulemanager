@@ -88,7 +88,7 @@ public class DayServiceImpl implements DayService {
 		c.setTime(sdf.parse(begin));
 		List<String> list = new ArrayList<String>();
 		list.add(begin);
-		for(int i=0;i<end;i++) {
+		for(int i=1;i<end;i++) {
 			c.add(Calendar.DATE, 1);
 			list.add(sdf.format(c.getTime()));
 		}
@@ -118,14 +118,23 @@ public class DayServiceImpl implements DayService {
 			d.setMorningCase(d.getMorningCase()+1);
 			Form Morning = new Form(form);
 			Form Afternoon = new Form(form);
+			
 			Morning.setDay(list.get(i));
 			Afternoon.setDay(list.get(i));
+			
 			Morning.setSession("morning");
 			Afternoon.setSession("afternoon");
+			
 			Morning.setDayID(d.getId());
 			Afternoon.setDayID(d.getId());
-			Morning.setStatus("stay");
-			Afternoon.setStatus("stay");
+			
+			
+			Morning.setStatus("waiting");
+			Afternoon.setStatus("waiting");
+			
+			Morning.setType("stay");
+			Afternoon.setType("stay");
+			
 			dayRepository.update(d);
 			formRepository.save(Morning);
 			formRepository.save(Afternoon);	
