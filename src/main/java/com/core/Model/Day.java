@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @NamedQuery(name="Day.findAll", query="SELECT d FROM Day d")
-@Table(name="Day")
+@Table(name="day")
 public class Day implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
