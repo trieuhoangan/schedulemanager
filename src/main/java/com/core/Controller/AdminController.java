@@ -31,6 +31,7 @@ import com.core.Wrapper.FilterWrapper;
 import com.core.Wrapper.FormCodeWrapper;
 import com.core.Wrapper.FormListWrapper;
 import com.core.Wrapper.PageNumberWrapper;
+import com.core.Wrapper.kappaWrapper;
 import com.core.Model.User;
 import com.core.Rest.JwtAuthenticationTokenFilter;
 import com.core.Wrapper.LoginDTO;
@@ -82,6 +83,24 @@ public class AdminController {
 		
 	}
 	
+	@PostMapping(value="/admin/kappa")
+	public kappaWrapper getKappa(@RequestBody FilterWrapper filter) {
+		List<Form> list_all = formService.getFilter(filter.getField(), filter.getValue());
+		filter.getField().add("session");
+		filter.getValue().add("morning");
+		List<Form> list_morn = formService.getFilter(filter.getField(), filter.getValue());
+		filter.getField().remove(1);
+		filter.getValue().remove(1);
+		filter.getField().add("status");
+		filter.getValue().add("canceled");
+		List<Form> canceled = formService.getFilter(filter.getField(), filter.getValue());
+		kappaWrapper wrapper = new kappaWrapper();
+		wrapper.setTotalForm(list_all.size());
+		wrapper.setMorningForm(list_morn.size());
+		wrapper.setAfternoonForm(list_all.size()-list_morn.size());
+		wrapper.setCanceledForm(canceled.size());
+		return wrapper;
+	}
 	@PostMapping(value="/admin/check_one_appointment")
 	@ResponseBody
 	public Form getOneCase(@RequestBody AppointmentIDWrapper id) {
