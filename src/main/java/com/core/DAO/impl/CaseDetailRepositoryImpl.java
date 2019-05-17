@@ -18,6 +18,7 @@ public class CaseDetailRepositoryImpl implements CaseDetailRepository{
 
 	@Autowired
 	private SessionFactory sessionFactory;
+	
 	@Override
 	public void save(CaseDetail caseDetail) {
 		Session session = this.sessionFactory.getCurrentSession();

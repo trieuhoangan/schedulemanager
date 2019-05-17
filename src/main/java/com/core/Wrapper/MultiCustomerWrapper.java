@@ -6,7 +6,13 @@ public class MultiCustomerWrapper {
 	private int number;
 	private String day;
 	private String session;
-	
+	private String address;
+	public String getAddress(){
+		return address;
+	}
+	public void setAddress(String add){
+		this.address = add;
+	}
 	public String getSession() {
 		return session;
 	}

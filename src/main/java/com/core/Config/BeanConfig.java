@@ -25,6 +25,7 @@ public class BeanConfig {
     dataSource.setPassword(env.getProperty("spring.datasource.password"));
     return dataSource;
   }
+  
   @Autowired
   @Bean(name = "sessionFactory")
   public SessionFactory getSessionFactory(DataSource dataSource) throws Exception {

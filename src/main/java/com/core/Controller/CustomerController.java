@@ -201,7 +201,7 @@ public class CustomerController {
 				tmp.setCode(token);
 				tmp.setSession(wrapper.getSession());
 				tmp.setType("multi");
-				
+				tmp.setAddress(wrapper.getAddress());
 				if(wrapper.getSession().matches("morning")) {
 					day.setMorningCase(day.getMorningCase()+1);
 					dayService.update(day);

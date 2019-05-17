@@ -29,6 +29,7 @@ import com.core.Wrapper.DayListWrapper;
 import com.core.Wrapper.DayWrapper;
 import com.core.Wrapper.FilterWrapper;
 import com.core.Wrapper.FormCodeWrapper;
+import com.core.Wrapper.FormIDWrapper;
 import com.core.Wrapper.FormListWrapper;
 import com.core.Wrapper.PageNumberWrapper;
 import com.core.Wrapper.kappaWrapper;
@@ -94,13 +95,19 @@ public class AdminController {
 		filter.getField().add("status");
 		filter.getValue().add("canceled");
 		List<Form> canceled = formService.getFilter(filter.getField(), filter.getValue());
+		filter.getField().remove(1);
+		filter.getValue().remove(1);
+		filter.getField().add("session");
+		filter.getValue().add("afternoon");
+		List<Form> list_after = formService.getFilter(filter.getField(), filter.getValue());
 		kappaWrapper wrapper = new kappaWrapper();
 		wrapper.setTotalForm(list_all.size());
 		wrapper.setMorningForm(list_morn.size());
-		wrapper.setAfternoonForm(list_all.size()-list_morn.size());
+		wrapper.setAfternoonForm(list_after.size());
 		wrapper.setCanceledForm(canceled.size());
 		return wrapper;
 	}
+
 	@PostMapping(value="/admin/check_one_appointment")
 	@ResponseBody
 	public Form getOneCase(@RequestBody AppointmentIDWrapper id) {
@@ -285,6 +292,38 @@ public class AdminController {
 		jwtAuthen.destroy(httpServletRequest);
 		
 	}
+	@PostMapping("/admin/cancel_one")
+	public FormCodeWrapper cancelOne(@RequestBody FormIDWrapper wrapper){
+		String id = wrapper.getId();
+		FormCodeWrapper result = new FormCodeWrapper();
+		Form tmp = formService.findById(Long.parseLong(id));
+		if(tmp.getStatus().matches("done")){
+			result.setStatus("bad");
+			return result;
+		}
+		else{
+			tmp.setStatus("canceled");
+			try{
+				Day day = dayService.findByDay(tmp.getDay());
+				if(tmp.getSession().matches("morning")){
+					day.setMorningCase(day.getMorningCase()-1);
+					if(day.getMorningCase()<0) day.setMorningCase(0);
+				}else{
+					day.setAfternoonCase(day.getAfternoonCase()-1);
+					if(day.getAfternoonCase()<0) day.setAfternoonCase(0);
+				}
+				dayService.update(day);
+				formService.update(tmp);
+			}catch(Exception e){
+				result.setStatus("bad");
+				return result;
+			}
+			result.setStatus("success");
+			return result;
+		}
+		
+	}
+		
 	
 	@PostMapping("/admin/add_account")
 	public FormCodeWrapper addAccount(@RequestBody User user) {
